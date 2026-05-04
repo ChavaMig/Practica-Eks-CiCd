@@ -1,0 +1,51 @@
+name: CI/CD Frontend EKS
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+env:
+  EKS_CLUSTER_NAME: temperaturas-cluster
+  AWS_REGION: us-east-1
+
+jobs:
+  build:
+    name: Construcción y despliegue del Frontend
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Descargar código del repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Iniciar sesión en Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Preparar TAG de la imagen Docker
+        id: docker_meta
+        uses: docker/metadata-action@v5
+        with:
+          images: mm98zgz/temperaturas-frontend
+          flavor: |
+            latest=false
+          tags: |
+            type=raw,value=v2
+
+      - name: Construir y subir imagen Docker
+        id: docker_build
+        uses: docker/build-push-action@v5
+        with:
+          context: ./frontend
+          push: true
+          tags: ${{ steps.docker_meta.outputs.tags }}
+          labels: ${{ steps.docker_meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          platforms: linux/amd64
