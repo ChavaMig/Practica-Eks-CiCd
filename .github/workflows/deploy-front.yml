@@ -64,3 +64,8 @@ jobs:
       - name: Desplegar frontend en EKS
         run: |
           kubectl apply -f k8s/frontend-deployment.yaml
+
+      - name: Reiniciar despliegue frontend
+        run: |
+          kubectl rollout restart deployment/temperaturas-frontend
+          kubectl rollout status deployment/temperaturas-frontend
