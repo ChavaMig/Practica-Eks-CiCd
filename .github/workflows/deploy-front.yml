@@ -32,7 +32,7 @@ jobs:
         id: docker_meta
         uses: docker/metadata-action@v5
         with:
-          images: mm98zgz/temperaturas-frontend:v2
+          images: mm98zgz/temperaturas-frontend
           flavor: |
             latest=false
           tags: |
